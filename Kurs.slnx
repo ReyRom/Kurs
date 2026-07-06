@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="Kurs.Application/Kurs.Application.csproj" />
+  <Project Path="Kurs.Domain/Kurs.Domain.csproj" />
+  <Project Path="Kurs.Infrastructure/Kurs.Infrastructure.csproj" />
+  <Project Path="Kurs.Shared/Kurs.Shared.csproj" />
+  <Project Path="Kurs.Student/Kurs.Student.csproj" />
+  <Project Path="Kurs.Teacher/Kurs.Teacher.csproj" />
+</Solution>
