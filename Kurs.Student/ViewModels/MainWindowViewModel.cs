@@ -1,7 +1,9 @@
-﻿namespace Kurs.Student.ViewModels
+﻿using Kurs.Domain.Models;
+
+namespace Kurs.Student.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
-        public string Greeting { get; } = "Welcome to Avalonia!";
+        private Course course;
     }
 }

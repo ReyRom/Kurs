@@ -12,5 +12,7 @@ namespace Kurs.Domain.Models
         public string Author { get; set; } = string.Empty;
         public string Version { get; set; } = "1.0";
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public List<Discipline> Disciplines { get; set; } = [];
     }
 }
