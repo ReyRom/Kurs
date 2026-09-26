@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,7 +12,8 @@ namespace Kurs.Domain.Models
         public int Order { get; set; }
         public Guid CourseId { get; set; }
 
-        public Course Course { get; set; } = null!;
         public List<Topic> Topics { get; set; } = [];
+        public List<Lesson> Lessons { get; set; } = [];
     }
 }
+

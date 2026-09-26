@@ -1,0 +1,213 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:vm="using:Kurs.Teacher.ViewModels" x:Class="Kurs.Teacher.Views.CourseEditorView"
+ x:DataType="vm:MainWindowViewModel" x:CompileBindings="False" Background="#F7F8FC">
+ <Grid RowDefinitions="Auto,*" RowSpacing="16" Margin="24,20">
+  <Border Classes="card" Padding="16,8">
+   <Expander Classes="editor-section" Header="Сведения о курсе" IsExpanded="False">
+    <ScrollViewer MaxHeight="240" HorizontalScrollBarVisibility="Disabled">
+     <Grid ColumnDefinitions="2*,2*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="20" RowSpacing="12" Margin="0,8,0,12">
+      <StackPanel Spacing="6">
+       <TextBlock Text="Название курса" Classes="field-label"/>
+       <TextBox Text="{Binding CourseTitle}" AutomationProperties.Name="Название курса"/>
+      </StackPanel>
+      <StackPanel Grid.Column="1" Spacing="6">
+       <TextBlock Text="Автор" Classes="field-label"/>
+       <TextBox Text="{Binding Author}" AutomationProperties.Name="Автор курса"/>
+      </StackPanel>
+      <StackPanel Grid.Column="2" Spacing="6">
+       <TextBlock Text="Дата создания" Classes="field-label"/>
+       <DatePicker SelectedDate="{Binding CreatedAt}" AutomationProperties.Name="Дата создания курса"/>
+      </StackPanel>
+      <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Spacing="6">
+       <TextBlock Text="Описание курса" Classes="field-label"/>
+       <TextBox Text="{Binding CourseDescription}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="72" AutomationProperties.Name="Описание курса"/>
+      </StackPanel>
+     </Grid>
+    </ScrollViewer>
+   </Expander>
+  </Border>
+  <Grid Grid.Row="1" ColumnDefinitions="300,*" ColumnSpacing="20">
+  <Border Classes="card" Padding="16">
+   <Grid RowDefinitions="Auto,*,Auto" RowSpacing="16">
+    <StackPanel Spacing="4"><TextBlock Text="Структура курса" FontSize="18" FontWeight="SemiBold"/><TextBlock Text="Выберите занятие" Foreground="#596579" FontSize="13"/></StackPanel>
+
+    <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
+     <ItemsControl ItemsSource="{Binding Disciplines}">
+      <ItemsControl.ItemTemplate><DataTemplate x:DataType="vm:DisciplineViewModel">
+       <StackPanel Spacing="8" Margin="0,0,0,20">
+        <Grid ColumnDefinitions="*,Auto" Background="#EEF2F7">
+         <TextBlock Text="{Binding Title}" Margin="10,8" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Title}" VerticalAlignment="Center"/>
+         <Button Grid.Column="1" Classes="icon" ToolTip.Tip="Свойства дисциплины" AutomationProperties.Name="Свойства дисциплины" Click="OpenProperties">
+          <PathIcon Width="16" Height="16" Data="M 3,4 H 21 V 6 H 3 Z M 3,11 H 21 V 13 H 3 Z M 3,18 H 21 V 20 H 3 Z" Foreground="#475569"/>
+          <Button.Flyout><Flyout Placement="Right"><StackPanel Width="320" Spacing="10">
+           <TextBlock Text="Свойства дисциплины" FontSize="18" FontWeight="SemiBold"/>
+           <TextBlock Text="Название" Classes="field-label"/><TextBox Text="{Binding Discipline.Title}"/>
+           <TextBlock Text="Описание" Classes="field-label"/><TextBox Text="{Binding Discipline.Description}" AcceptsReturn="True" TextWrapping="Wrap"/>
+           <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Content="Выше" Command="{Binding Editor.MoveDisciplineUpCommand}" CommandParameter="{Binding Discipline}"/>
+            <Button Content="Ниже" Command="{Binding Editor.MoveDisciplineDownCommand}" CommandParameter="{Binding Discipline}"/>
+           </StackPanel>
+           <Button Classes="danger" Content="Удалить дисциплину" Command="{Binding Editor.RequestDeleteCommand}" CommandParameter="{Binding Discipline}" Click="CloseProperties"/>
+          </StackPanel></Flyout></Button.Flyout>
+         </Button>
+        </Grid>
+        <ItemsControl ItemsSource="{Binding Topics}">
+         <ItemsControl.ItemTemplate><DataTemplate x:DataType="vm:TopicViewModel">
+          <StackPanel Spacing="4" Margin="8,0,0,8">
+           <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="{Binding Title}" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Title}"/>
+            <Button Grid.Column="1" Classes="icon" ToolTip.Tip="Свойства темы" AutomationProperties.Name="Свойства темы" Click="OpenProperties">
+             <PathIcon Width="16" Height="16" Data="M 2,10 H 6 V 14 H 2 Z M 10,10 H 14 V 14 H 10 Z M 18,10 H 22 V 14 H 18 Z" Foreground="#475569"/>
+             <Button.Flyout><Flyout Placement="Right"><StackPanel Width="320" Spacing="10">
+              <TextBlock Text="Свойства темы" FontSize="18" FontWeight="SemiBold"/>
+              <TextBlock Text="Название" Classes="field-label"/><TextBox Text="{Binding Topic.Title}"/>
+              <TextBlock Text="Описание" Classes="field-label"/><TextBox Text="{Binding Topic.Description}" AcceptsReturn="True" TextWrapping="Wrap"/>
+              <StackPanel Orientation="Horizontal" Spacing="8"><Button Content="Выше" Command="{Binding MoveUpCommand}"/><Button Content="Ниже" Command="{Binding MoveDownCommand}"/></StackPanel>
+              <Button Classes="danger" Content="Удалить тему" Command="{Binding RequestDeleteCommand}"/>
+              <StackPanel IsVisible="{Binding IsDeletePending}" Spacing="8">
+               <TextBlock Text="Удалить тему? Занятия останутся в дисциплине без темы." TextWrapping="Wrap"/>
+               <Button Classes="danger" Content="Подтвердить удаление" Command="{Binding ConfirmDeleteCommand}"/><Button Content="Отмена" Command="{Binding CancelDeleteCommand}"/>
+              </StackPanel>
+             </StackPanel></Flyout></Button.Flyout>
+            </Button>
+           </Grid>
+           <ItemsControl ItemsSource="{Binding Lessons}"><ItemsControl.ItemTemplate><DataTemplate x:DataType="vm:LessonViewModel">
+            <Button Classes="tree-lesson" Classes.selected="{Binding IsSelected}" HorizontalAlignment="Stretch" Command="{Binding DataContext.SelectLessonCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
+             <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Title}"/>
+            </Button>
+           </DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+           <Button Classes="add" Content="Добавить занятие" Command="{Binding DataContext.AddLessonToTopicCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+          </StackPanel>
+         </DataTemplate></ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <ItemsControl ItemsSource="{Binding UngroupedLessons}"><ItemsControl.ItemTemplate><DataTemplate x:DataType="vm:LessonViewModel">
+         <Button Classes="tree-lesson" Classes.selected="{Binding IsSelected}" HorizontalAlignment="Stretch" Command="{Binding DataContext.SelectLessonCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
+          <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Title}"/>
+         </Button>
+        </DataTemplate></ItemsControl.ItemTemplate></ItemsControl>
+        <Button Classes="add" Content="Добавить тему" Command="{Binding DataContext.AddTopicToDisciplineCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+       </StackPanel>
+      </DataTemplate></ItemsControl.ItemTemplate>
+     </ItemsControl>
+    </ScrollViewer>
+    <Button Grid.Row="2" Classes="secondary" Content="Добавить дисциплину" HorizontalAlignment="Stretch" Command="{Binding AddDisciplineCommand}"/>
+   </Grid>
+  </Border>
+  <Border Grid.Column="1" Classes="card" Padding="24" IsVisible="{Binding !SelectedLesson}">
+   <StackPanel VerticalAlignment="Center" Spacing="10"><TextBlock Text="Выберите занятие" FontSize="22" FontWeight="SemiBold"/><TextBlock Text="Выберите занятие слева или создайте новое в нужной теме." Foreground="#596579" TextWrapping="Wrap"/></StackPanel>
+  </Border>
+  <ScrollViewer Grid.Column="1" IsVisible="{Binding !!SelectedLesson}" HorizontalScrollBarVisibility="Disabled">
+   <StackPanel Spacing="16" Margin="0,0,8,0">
+        <Border Classes="card" Padding="24">
+          <StackPanel Spacing="16">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Text="Занятие" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"/>
+              <Button Grid.Column="1" Classes="secondary" Content="Действия" AutomationProperties.Name="Действия с занятием">
+                <Button.Flyout>
+                  <Flyout>
+                    <StackPanel Spacing="8">
+                      <Button Content="Переместить выше" Command="{Binding MoveLessonUpCommand}" CommandParameter="{Binding SelectedLesson}" HorizontalAlignment="Stretch"/>
+                      <Button Content="Переместить ниже" Command="{Binding MoveLessonDownCommand}" CommandParameter="{Binding SelectedLesson}" HorizontalAlignment="Stretch"/>
+                      <Button Content="Удалить занятие" Classes="danger" Command="{Binding RequestDeleteCommand}" CommandParameter="{Binding SelectedLesson}" HorizontalAlignment="Stretch"/>
+                    </StackPanel>
+                  </Flyout>
+                </Button.Flyout>
+              </Button>
+            </Grid>
+            <StackPanel Spacing="6"><TextBlock Text="Название занятия" Classes="field-label"/>
+            <TextBox Text="{Binding SelectedLesson.Title}" PlaceholderText="Введите название занятия" FontSize="18" AutomationProperties.Name="Название занятия"/></StackPanel>
+            <StackPanel Spacing="6"><TextBlock Text="Описание" Classes="field-label"/>
+            <TextBox Text="{Binding SelectedLesson.Description}" PlaceholderText="Что изучат учащиеся" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="90" AutomationProperties.Name="Описание занятия"/></StackPanel>
+            <StackPanel Spacing="6"><TextBlock Text="Тема" Classes="field-label"/>
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+              <ComboBox ItemsSource="{Binding SelectedDiscipline.Topics}" SelectedItem="{Binding SelectedLesson.Topic, Mode=TwoWay}" HorizontalAlignment="Stretch" PlaceholderText="Без темы" AutomationProperties.Name="Тема занятия">
+                <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis"/></DataTemplate></ComboBox.ItemTemplate>
+              </ComboBox>
+              <Button Grid.Column="1" Classes="secondary" Content="Убрать из темы" Command="{Binding UngroupLessonCommand}" IsEnabled="{Binding !!SelectedLesson.Topic}"/>
+            </Grid></StackPanel>
+          </StackPanel>
+        </Border>
+        <Border Classes="card" Padding="24">
+          <StackPanel Spacing="16">
+            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*" ColumnSpacing="8" RowSpacing="12">
+              <StackPanel Grid.ColumnSpan="2">
+                <TextBlock Text="Учебные материалы" FontSize="17" FontWeight="SemiBold"/>
+                <TextBlock Text="HTML отдельно или вместе с папкой медиа"
+                           FontSize="13" Foreground="#596579" TextWrapping="Wrap"/>
+              </StackPanel>
+              <Button Grid.Row="1" Classes="secondary" Content="Добавить HTML"
+                      Command="{Binding AddMaterialCommand}"/>
+              <Button Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" Classes="secondary" Content="Добавить HTML с медиа"
+                      Command="{Binding AddMaterialWithMediaCommand}"/>
+            </Grid>
+            <TextBlock Text="Материалов пока нет. Добавьте HTML-файл занятия." IsVisible="{Binding !SelectedLesson.Materials.Count}" Foreground="#596579" TextWrapping="Wrap"/><ItemsControl ItemsSource="{Binding SelectedLesson.Materials}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:MaterialViewModel">
+                  <Border Background="#FAFAFD" CornerRadius="10" Padding="12" Margin="0,0,0,8">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                      <Border Width="34" Height="34" Background="#E9F7F0" CornerRadius="9">
+                        <PathIcon Width="18" Height="18" Foreground="#166534" Data="M 5,2 H 14 L 20,8 V 22 H 5 Z M 7,4 V 20 H 18 V 9 H 13 V 4 Z" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                      </Border>
+                      <StackPanel Grid.Column="1" Spacing="6">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                          <TextBox Text="{Binding Title}" FontWeight="SemiBold" MinHeight="40" AutomationProperties.Name="Название материала"/>
+                          <Button Grid.Column="1" Classes="icon danger" VerticalAlignment="Center" ToolTip.Tip="Удалить материал" AutomationProperties.Name="Удалить материал" Command="{Binding DataContext.RequestDeleteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
+                            <PathIcon Width="16" Height="16" Foreground="#B42318" Data="M 6,3 H 10 V 1 H 14 V 3 H 18 V 5 H 6 Z M 7,7 H 17 L 16,21 H 8 Z M 10,9 V 18 H 11 V 9 Z M 13,9 V 18 H 14 V 9 Z"/>
+                          </Button>
+                        </Grid>
+                        <TextBlock Text="{Binding Source}" FontSize="12" Foreground="#596579"
+                                   TextTrimming="CharacterEllipsis"/>
+                        <TextBlock IsVisible="{Binding !!MediaDirectory}" Text="{Binding MediaDirectory}" FontSize="12" Foreground="#166534"
+                                   TextTrimming="CharacterEllipsis"/>
+                      </StackPanel>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="card" Padding="24">
+          <StackPanel Spacing="16">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+              <StackPanel>
+                <TextBlock Text="Тесты занятия" FontSize="17" FontWeight="SemiBold"/>
+                <TextBlock Text="Вопросы и баллы настраиваются в редакторе теста"
+                           FontSize="13" Foreground="#596579" TextWrapping="Wrap"/>
+              </StackPanel>
+              <Button Grid.Column="1" Classes="secondary" Content="Добавить тест"
+                      Command="{Binding AddTestCommand}"/>
+            </Grid>
+            <TextBlock Text="Тестов пока нет. Создайте тест для проверки знаний." IsVisible="{Binding !SelectedLesson.Tests.Count}" Foreground="#596579" TextWrapping="Wrap"/><ItemsControl ItemsSource="{Binding SelectedLesson.Tests}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:TestViewModel">
+                  <Button Classes="list-card"
+                          Command="{Binding DataContext.SelectTestCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                          CommandParameter="{Binding}">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                      <StackPanel>
+                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                        <TextBlock Text="{Binding Questions.Count, StringFormat='{}{0} вопросов'}"
+                                   FontSize="12" Foreground="#596579"/>
+                      </StackPanel>
+                      <TextBlock Grid.Column="1" Text="{Binding TotalPoints, StringFormat='{}{0} баллов'}"
+                                 Foreground="#4F46E5" VerticalAlignment="Center"/>
+                    </Grid>
+                  </Button>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
+
+  </Grid>
+ </Grid>
+</UserControl>
+
+
+
+
+

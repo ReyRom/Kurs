@@ -1,8 +1,9 @@
-﻿namespace Kurs.Application.Interfaces
+using Kurs.Application.Models;
+
+namespace Kurs.Application.Interfaces;
+
+public interface ICoursePackager
 {
-    public interface ICoursePackager
-    {
-        Task<string> ExportCourseAsync(string coursePath, string outputPath, string courseTitle);
-        Task<string> ImportCourseAsync(string zipPath, string extractPath);
-    }
+    Task ExportAsync(CoursePackage package, string outputPath);
+    Task<CoursePackage> ImportAsync(string archivePath);
 }

@@ -34,5 +34,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Kurs.Domain\Kurs.Domain.csproj" />
+    <ProjectReference Include="..\Kurs.Application\Kurs.Application.csproj" />
+    <ProjectReference Include="..\Kurs.Infrastructure\Kurs.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

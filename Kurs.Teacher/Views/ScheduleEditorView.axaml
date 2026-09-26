@@ -1,0 +1,184 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Kurs.Teacher.ViewModels"
+             x:Class="Kurs.Teacher.Views.ScheduleEditorView"
+             x:DataType="vm:MainWindowViewModel"
+             x:CompileBindings="False"
+             Background="#F7F8FC">
+  <Grid RowDefinitions="Auto,*" Margin="28,24">
+    <Grid ColumnDefinitions="*,Auto">
+      <StackPanel Spacing="4">
+        <TextBlock Text="Расписание занятий" FontSize="26" FontWeight="SemiBold"/>
+        <TextBlock Text="Распределяйте занятия по дням недели и задавайте порядок внутри каждого дня."
+                   Foreground="#687084"/>
+      </StackPanel>
+      <Button Grid.Column="1" Classes="primary" Content="К содержанию"
+              Command="{Binding SetSelectedSectionCommand}" CommandParameter="Содержание"/>
+    </Grid>
+
+    <Grid Grid.Row="1" ColumnDefinitions="260,*,270" ColumnSpacing="18" Margin="0,22,0,0">
+      <Border Background="White" CornerRadius="16" Padding="16"
+              BorderBrush="#E7E9F0" BorderThickness="1">
+        <StackPanel Spacing="12">
+          <TextBlock Text="Режим доступа" FontSize="17" FontWeight="SemiBold"/>
+          <ComboBox ItemsSource="{Binding ScheduleModes}" SelectedItem="{Binding SelectedScheduleMode}">
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:ScheduleModeOption">
+                <StackPanel>
+                  <TextBlock Text="{Binding Title}"/>
+                  <TextBlock Text="{Binding Description}" FontSize="11"
+                             Foreground="#7A8194" TextWrapping="Wrap"/>
+                </StackPanel>
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+          <Border Background="#F4F5FF" CornerRadius="9" Padding="10">
+            <TextBlock Text="В строгом режиме важны назначенная дата и последовательность занятий этого дня."
+                       TextWrapping="Wrap" FontSize="12" Foreground="#525A70"/>
+          </Border>
+        </StackPanel>
+      </Border>
+
+      <Border Grid.Column="1" Background="White" CornerRadius="16" Padding="18"
+              BorderBrush="#E7E9F0" BorderThickness="1">
+        <Grid RowDefinitions="Auto,*" RowSpacing="14">
+          <Grid ColumnDefinitions="Auto,*,Auto">
+            <Button Classes="secondary" Content="← Неделя" Command="{Binding PreviousWeekCommand}"/>
+            <TextBlock Grid.Column="1"
+                       Text="{Binding ScheduleWeekStart, StringFormat='Неделя с {0:dd MMMM}'}"
+                       FontSize="17" FontWeight="SemiBold"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <Button Grid.Column="2" Classes="secondary" Content="Неделя →"
+                    Command="{Binding NextWeekCommand}"/>
+          </Grid>
+
+          <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding ScheduleDays}" Width="980">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <UniformGrid Rows="1" Columns="7"/>
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:ScheduleDayViewModel">
+                  <Border BorderBrush="#E7E9F0" BorderThickness="0,0,1,0"
+                          Background="Transparent"
+                          Padding="10" MinWidth="140" MinHeight="460"
+                          VerticalAlignment="Stretch"
+                          DragDrop.AllowDrop="True"
+                          DragDrop.DragOver="ScheduleDay_DragOver"
+                          DragDrop.Drop="ScheduleDay_Drop">
+                    <StackPanel Spacing="8">
+                      <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextAlignment="Center"/>
+                      <ItemsControl ItemsSource="{Binding Items}">
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="vm:ScheduleItemViewModel">
+                            <Border Background="{Binding DisciplineColor}"
+                                    CornerRadius="8" Padding="8" Margin="0,0,0,6"
+                                    DragDrop.AllowDrop="True"
+                                    DragDrop.DragOver="ScheduleItem_DragOver"
+                                    DragDrop.Drop="ScheduleItem_Drop">
+                              <StackPanel Spacing="5">
+                                <TextBlock Text="{Binding DisciplineTitle}"
+                                           FontSize="10" Foreground="#626A7E"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding LessonTitle}"
+                                           FontWeight="SemiBold" TextWrapping="Wrap"/>
+                                <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto" ColumnSpacing="4">
+                                  <TextBlock Text="⠿" Foreground="#697086"
+                                             Cursor="SizeAll"
+                                             PointerPressed="ScheduleItem_PointerPressed"
+                                             ToolTip.Tip="Перетащить занятие"/>
+                                  <TextBlock Grid.Column="1" Text="{Binding Order}" Foreground="#4F46E5"
+                                             FontWeight="Bold" VerticalAlignment="Center"/>
+                                  <Button Grid.Column="3" Classes="link" Content="↑"
+                                          Command="{Binding DataContext.MoveScheduleUpCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          CommandParameter="{Binding}"/>
+                                  <Button Grid.Column="4" Classes="link" Content="↓"
+                                          Command="{Binding DataContext.MoveScheduleDownCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          CommandParameter="{Binding}"/>
+                                  <Button Grid.Column="5" Classes="link" Content="×"
+                                          Command="{Binding DataContext.RemoveScheduleCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                          CommandParameter="{Binding}"/>
+                                </Grid>
+                              </StackPanel>
+                            </Border>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                      <Border MinHeight="86"
+                              Background="#FAFAFD"
+                              BorderBrush="#D9DDEA"
+                              BorderThickness="1"
+                              CornerRadius="8"
+                              Padding="8"
+                              DragDrop.AllowDrop="True"
+                              DragDrop.DragOver="ScheduleDay_DragOver"
+                              DragDrop.Drop="ScheduleDay_Drop">
+                        <TextBlock Text="Перетащите занятие сюда"
+                                   FontSize="11"
+                                   Foreground="#8A90A2"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                      </Border>
+                    </StackPanel>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </Grid>
+      </Border>
+
+      <Border Grid.Column="2" Background="White" CornerRadius="16" Padding="16"
+              BorderBrush="#E7E9F0" BorderThickness="1">
+        <StackPanel Spacing="10">
+          <TextBlock Text="Добавить занятие" FontSize="17" FontWeight="SemiBold"/>
+          <TextBlock Text="Дата" FontSize="12" Foreground="#7A8194"/>
+          <DatePicker SelectedDate="{Binding ScheduleDate}"/>
+          <TextBlock Text="Выберите занятие или перетащите его в нужный день"
+                     FontSize="12" Foreground="#7A8194" TextWrapping="Wrap"/>
+          <ScrollViewer MaxHeight="360">
+            <ItemsControl ItemsSource="{Binding Disciplines}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:DisciplineViewModel">
+                  <StackPanel Spacing="3" Margin="0,0,0,8">
+                    <Border Background="{Binding Color}" CornerRadius="6" Padding="7,4">
+                      <TextBlock Text="{Binding Title}" FontWeight="SemiBold"/>
+                    </Border>
+                    <ItemsControl ItemsSource="{Binding Lessons}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:LessonViewModel">
+                          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="5">
+                            <Button Classes="lesson" Content="{Binding Title}"
+                                    Command="{Binding DataContext.SelectLessonCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding}"/>
+                            <Border Grid.Column="1" Width="30" CornerRadius="7"
+                                    Background="#F0F1FF"
+                                    ToolTip.Tip="Перетащить в расписание">
+                              <TextBlock Text="⠿" Foreground="#4F46E5"
+                                         Cursor="SizeAll"
+                                         HorizontalAlignment="Center"
+                                         VerticalAlignment="Center"
+                                         PointerPressed="Lesson_PointerPressed"/>
+                            </Border>
+                          </Grid>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </StackPanel>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+          <TextBlock Text="{Binding SelectedLesson.Title}" FontSize="12"
+                     Foreground="#4F46E5" TextWrapping="Wrap"/>
+          <Button Classes="secondary" Content="Добавить в выбранный день"
+                  Command="{Binding AddScheduleCommand}"/>
+        </StackPanel>
+      </Border>
+    </Grid>
+  </Grid>
+</UserControl>

@@ -12,6 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Kurs.Application\Kurs.Application.csproj" />
+    <ProjectReference Include="..\Kurs.Infrastructure\Kurs.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <AvaloniaXaml Remove="Models\**" />
     <Compile Remove="Models\**" />
     <EmbeddedResource Remove="Models\**" />

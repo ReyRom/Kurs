@@ -1,20 +1,92 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Kurs.Teacher.ViewModels"
+        xmlns:views="using:Kurs.Teacher.Views"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d"
+        d:DesignWidth="1440"
+        d:DesignHeight="900"
         x:Class="Kurs.Teacher.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="Kurs.Teacher">
+        x:CompileBindings="False"
+        Width="1440"
+        Height="900"
+        MinWidth="1120"
+        MinHeight="720"
+        Background="#F7F8FC"
+        Title="Kurs — преподаватель">
+  <Design.DataContext>
+    <vm:MainWindowViewModel/>
+  </Design.DataContext>
 
-    <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
+  <Grid>
+  <Grid RowDefinitions="Auto,*,Auto" IsEnabled="{Binding !IsDeletePending}">
+    <Border Background="#FFFFFF"
+            BorderBrush="#E7E9F0"
+            BorderThickness="0,0,0,1"
+            Padding="28,14">
+      <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
+        <StackPanel Orientation="Horizontal" Spacing="11">
+          <Border Width="36" Height="36" Background="#4F46E5" CornerRadius="10">
+            <TextBlock Text="K" Foreground="White" FontWeight="Bold" FontSize="18"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <StackPanel>
+            <TextBlock Text="Kurs" FontSize="18" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding CourseTitle}" FontSize="11" Foreground="#596579"
+                       MaxWidth="230" TextTrimming="CharacterEllipsis"/>
+          </StackPanel>
+        </StackPanel>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <StackPanel Grid.Column="1" Orientation="Horizontal"
+                    HorizontalAlignment="Center" Spacing="6">
+          <Button Classes="nav" Content="Содержание"
+                  Command="{Binding SetSelectedSectionCommand}" CommandParameter="Содержание"/>
+          <Button Classes="nav" Content="Расписание"
+                  Command="{Binding SetSelectedSectionCommand}" CommandParameter="Расписание"/>
+          <Button Classes="nav" Content="Тесты"
+                  Command="{Binding SetSelectedSectionCommand}" CommandParameter="Тесты"/>
+        </StackPanel>
 
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+          <Button Classes="secondary" Content="Новый курс" Command="{Binding NewCourseCommand}"/>
+          <Button Classes="secondary" Content="Открыть .kurs" Command="{Binding OpenCourseCommand}"/>
+          <Button Classes="secondary" Content="Экспорт .kurs" Command="{Binding ExportCourseCommand}"/><Button Classes="primary" Content="Сохранить" Command="{Binding SaveDraftCommand}"/>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <views:CourseEditorView Grid.Row="1" IsVisible="{Binding IsCourseEditorVisible}"/>
+    <views:TestEditorView Grid.Row="1" IsVisible="{Binding IsTestEditorVisible}"/>
+    <views:ScheduleEditorView Grid.Row="1" IsVisible="{Binding IsScheduleEditorVisible}"/>
+
+    <Border Grid.Row="2"
+            Background="White"
+            BorderBrush="#E7E9F0"
+            BorderThickness="0,1,0,0"
+            Padding="28,10">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <Ellipse Width="8" Height="8" Fill="#18804B" VerticalAlignment="Center"/>
+        <TextBlock Grid.Column="1" Text="{Binding StatusText}"
+                   Margin="8,0" Foreground="#687084" FontSize="12"/>
+        <TextBlock Grid.Column="2" Text="{Binding SelectedSection}"
+                   Foreground="#596579" FontSize="12"/>
+      </Grid>
+    </Border>
+  </Grid>
+  <Border Background="#66000000" IsVisible="{Binding IsDeletePending}">
+    <Border Classes="card" Padding="24" Width="460" HorizontalAlignment="Center" VerticalAlignment="Center">
+      <StackPanel Spacing="16">
+        <TextBlock Text="Подтвердите удаление" FontSize="20" FontWeight="SemiBold"/>
+        <TextBlock Text="{Binding DeleteMessage}" TextWrapping="Wrap"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+          <Button Content="Отмена" Command="{Binding CancelDeleteCommand}"/>
+          <Button Content="Удалить" Background="#B42318" Foreground="White" Command="{Binding ConfirmDeleteCommand}"/>
+        </StackPanel>
+      </StackPanel>
+    </Border>
+  </Border>
+  </Grid>
 </Window>
+

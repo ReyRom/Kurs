@@ -4,13 +4,13 @@
              xmlns:local="using:Kurs.Teacher"
              xmlns:theme="using:Material.Styles.Themes"
              RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
         <local:ViewLocator/>
     </Application.DataTemplates>
   
     <Application.Styles>
-        <theme:MaterialTheme />
+        <theme:MaterialTheme BaseTheme="Light" PrimaryColor="Indigo" SecondaryColor="Lime"/>
+        <StyleInclude Source="avares://Kurs.Teacher/Styles/AppStyles.axaml" />
     </Application.Styles>
 </Application>

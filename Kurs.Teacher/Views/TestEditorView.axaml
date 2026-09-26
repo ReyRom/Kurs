@@ -1,0 +1,154 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Kurs.Teacher.ViewModels"
+             x:Class="Kurs.Teacher.Views.TestEditorView"
+             x:DataType="vm:MainWindowViewModel"
+             x:CompileBindings="False" Background="#F7F8FC">
+  <Grid RowDefinitions="Auto,*" RowSpacing="20" Margin="24,20">
+    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+      <StackPanel Spacing="4">
+        <TextBlock Text="Редактор тестов" FontSize="24" FontWeight="SemiBold"/>
+        <TextBlock Text="Настройте вопросы и отметьте правильные ответы." Foreground="#596579" FontSize="13" TextWrapping="Wrap"/>
+      </StackPanel>
+      <Button Grid.Column="1" Classes="secondary" Content="К содержанию" VerticalAlignment="Center"
+              Command="{Binding SetSelectedSectionCommand}" CommandParameter="Содержание"/>
+    </Grid>
+    <Grid Grid.Row="1" ColumnDefinitions="300,*" ColumnSpacing="20">
+      <Border Classes="card" Padding="16">
+        <Grid RowDefinitions="Auto,*,Auto" RowSpacing="16">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Тесты курса" FontSize="18" FontWeight="SemiBold"/>
+            <TextBlock Text="Выберите тест для редактирования" FontSize="13" Foreground="#596579" TextWrapping="Wrap"/>
+          </StackPanel>
+          <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Spacing="8">
+              <TextBlock Text="Тестов пока нет. Выберите занятие в содержании курса и добавьте тест."
+                         IsVisible="{Binding !Tests.Count}" Foreground="#596579" TextWrapping="Wrap"/>
+              <ItemsControl ItemsSource="{Binding Tests}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:TestViewModel">
+                    <Button Classes="test-item" Classes.selected="{Binding IsSelected}" HorizontalAlignment="Stretch"
+                            Command="{Binding DataContext.SelectTestCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
+                      <StackPanel Spacing="4">
+                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Title}"/>
+                        <TextBlock Text="{Binding LessonTitle}" FontSize="12" Foreground="#596579" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding LessonTitle}"/>
+                        <TextBlock Text="{Binding Questions.Count, StringFormat='Вопросов: {0}'}" FontSize="12" Foreground="#596579"/>
+                      </StackPanel>
+                    </Button>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </ScrollViewer>
+          <StackPanel Grid.Row="2" Spacing="8">
+            <TextBlock Text="{Binding SelectedLesson.Title, StringFormat='Новый тест для занятия: {0}'}"
+                       IsVisible="{Binding !!SelectedLesson}" FontSize="12" Foreground="#596579" TextWrapping="Wrap"/>
+            <Button Classes="secondary" Content="Добавить тест" HorizontalAlignment="Stretch"
+                    IsEnabled="{Binding !!SelectedLesson}" Command="{Binding AddTestCommand}"/>
+          </StackPanel>
+        </Grid>
+      </Border>
+      <Border Grid.Column="1" Classes="card" Padding="24" IsVisible="{Binding !SelectedTest}">
+        <StackPanel VerticalAlignment="Center" Spacing="8">
+          <TextBlock Text="Выберите тест" FontSize="22" FontWeight="SemiBold"/>
+          <TextBlock Text="Откройте тест слева или создайте новый для выбранного занятия." Foreground="#596579" TextWrapping="Wrap"/>
+        </StackPanel>
+      </Border>
+      <ScrollViewer Grid.Column="1" IsVisible="{Binding !!SelectedTest}" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Spacing="16" Margin="0,0,8,0">
+          <Border Classes="card" Padding="24">
+            <StackPanel Spacing="16">
+              <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                <TextBlock Text="Сведения о тесте" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                <Button Grid.Column="1" Classes="secondary" Content="Действия">
+                  <Button.Flyout>
+                    <Flyout>
+                      <Button Classes="danger" Content="Удалить тест" Command="{Binding RequestDeleteCommand}" CommandParameter="{Binding SelectedTest}"/>
+                    </Flyout>
+                  </Button.Flyout>
+                </Button>
+              </Grid>
+              <StackPanel Spacing="6">
+                <TextBlock Text="Название теста" Classes="field-label"/>
+                <TextBox Text="{Binding SelectedTest.Title}" PlaceholderText="Введите название теста" FontSize="18" AutomationProperties.Name="Название теста"/>
+              </StackPanel>
+              <TextBlock Text="{Binding SelectedTest.LessonTitle, StringFormat='Занятие: {0}'}" Foreground="#596579" FontSize="13" TextWrapping="Wrap"/>
+            </StackPanel>
+          </Border>
+          <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16" Margin="0,4">
+            <StackPanel Spacing="4">
+              <TextBlock Text="Вопросы" FontSize="18" FontWeight="SemiBold"/>
+              <TextBlock Text="Для одного ответа отметьте один вариант, для нескольких — все верные."
+                         FontSize="13" Foreground="#596579" TextWrapping="Wrap"/>
+            </StackPanel>
+            <Button Grid.Column="1" Classes="primary" Content="Добавить вопрос" VerticalAlignment="Center" Command="{Binding AddQuestionToSelectedTestCommand}"/>
+          </Grid>
+          <Border Classes="card" Padding="24" IsVisible="{Binding !SelectedTest.Questions.Count}">
+            <TextBlock Text="Вопросов пока нет. Добавьте первый вопрос и варианты ответа." Foreground="#596579" TextWrapping="Wrap"/>
+          </Border>
+          <ItemsControl ItemsSource="{Binding SelectedTest.Questions}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:QuestionViewModel">
+                <Border Classes="card" Padding="24" Margin="0,0,0,16">
+                  <StackPanel Spacing="16">
+                    <StackPanel Spacing="6">
+                      <TextBlock Text="Текст вопроса" Classes="field-label"/>
+                      <TextBox Text="{Binding Text}" PlaceholderText="Введите вопрос" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="80" AutomationProperties.Name="Текст вопроса"/>
+                    </StackPanel>
+                    <Grid ColumnDefinitions="*,100" ColumnSpacing="16">
+                      <StackPanel Spacing="6">
+                        <TextBlock Text="Тип ответа" Classes="field-label"/>
+                        <ComboBox ItemsSource="{Binding AvailableTypes}" SelectedItem="{Binding SelectedType}" HorizontalAlignment="Stretch" AutomationProperties.Name="Тип ответа">
+                          <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="vm:QuestionTypeOption"><TextBlock Text="{Binding Title}" TextWrapping="Wrap"/></DataTemplate>
+                          </ComboBox.ItemTemplate>
+                        </ComboBox>
+                      </StackPanel>
+                      <StackPanel Grid.Column="1" Spacing="6">
+                        <TextBlock Text="Баллы" Classes="field-label"/>
+                        <TextBox Text="{Binding Points}" AutomationProperties.Name="Баллы за вопрос"/>
+                      </StackPanel>
+                    </Grid>
+                    <StackPanel Spacing="8">
+                      <TextBlock Text="Изображение к вопросу" Classes="field-label"/>
+                      <WrapPanel>
+                        <Button Classes="secondary" Content="Загрузить изображение" Margin="0,0,8,8"
+                                Command="{Binding DataContext.AddQuestionImageCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+                        <Button Classes="danger" Content="Убрать изображение" IsVisible="{Binding !!ImagePath}" Margin="0,0,0,8"
+                                Command="{Binding DataContext.RemoveQuestionImageCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+                      </WrapPanel>
+                      <TextBlock Text="{Binding ImagePath}" IsVisible="{Binding !!ImagePath}" FontSize="12" Foreground="#596579" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding ImagePath}"/>
+                    </StackPanel>
+                    <Border Height="1" Background="#E7E9F0"/>
+                    <StackPanel Spacing="12">
+                      <TextBlock Text="Варианты ответа" FontSize="15" FontWeight="SemiBold"/>
+                      <ItemsControl ItemsSource="{Binding Options}">
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="vm:AnswerOptionViewModel">
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Margin="0,0,0,8">
+                              <CheckBox IsChecked="{Binding IsCorrect}" VerticalAlignment="Center" ToolTip.Tip="Правильный ответ" AutomationProperties.Name="Правильный ответ"/>
+                              <TextBox Grid.Column="1" Text="{Binding Text}" PlaceholderText="Вариант ответа" TextWrapping="Wrap" AcceptsReturn="True" AutomationProperties.Name="Вариант ответа"/>
+                              <Button Grid.Column="2" Classes="icon danger" VerticalAlignment="Center" ToolTip.Tip="Удалить вариант" AutomationProperties.Name="Удалить вариант"
+                                      Command="{Binding DataContext.RequestDeleteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}">
+                                <PathIcon Width="16" Height="16" Foreground="#B42318" Data="M 6,3 H 10 V 1 H 14 V 3 H 18 V 5 H 6 Z M 7,7 H 17 L 16,21 H 8 Z M 10,9 V 18 H 11 V 9 Z M 13,9 V 18 H 14 V 9 Z"/>
+                              </Button>
+                            </Grid>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                      <Button Classes="secondary" Content="Добавить вариант" HorizontalAlignment="Left"
+                              Command="{Binding DataContext.AddAnswerOptionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+                    </StackPanel>
+                    <Border Height="1" Background="#E7E9F0"/>
+                    <Button Classes="danger" Content="Удалить вопрос" HorizontalAlignment="Right"
+                            Command="{Binding DataContext.RequestDeleteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </ScrollViewer>
+    </Grid>
+  </Grid>
+</UserControl>
